@@ -1,0 +1,38 @@
+import serial
+import wave 
+import numpy as np
+import time
+
+ser = serial.Serial('COM3', 115200)
+
+data = np.array([])
+SAMPLE_RATE = 9000
+loop = 5*SAMPLE_RATE
+
+
+
+
+for i in range(loop):
+
+    # read the audio (or use just read)
+    audio = ser.read(1)
+    print(audio)
+
+    # add the new audio data
+    data = np.append(data, audio[0])
+
+
+# normalise 
+data = (data - data.min()) / data.max() # scale to 0-1
+data = data * 255 # scale to 0-255
+data = data.astype(np.uint8) # convert to uint8 type
+
+# write to the wave file
+with wave.open("audio.wav", 'wb') as wf:
+    wf.setnchannels(1) # mono audio (single channel)
+    wf.setsampwidth(1) # 8 bits (1 byte ) per sample
+    wf.setframerate(SAMPLE_RATE) # set the sample rate that the data was recorded at
+    wf.writeframes(data.tobytes()) # write the audio data to the file
+
+
+print("finished")
