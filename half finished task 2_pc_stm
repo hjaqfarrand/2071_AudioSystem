@@ -118,29 +118,27 @@ int main(void)
       // Receive mode command from PC
       HAL_UART_Receive(&huart2, &i, 1, HAL_MAX_DELAY);
 
-      // ================= MANUAL MODE =================
+      // ===== MANUAL MODE =================
       if(i == '1')
       {
           while(1)
           {
-              // Receive audio byte from STM1
+              //reeceive audio byte from STM1
         	  if (HAL_UART_Receive(&huart1, &rxData, 1, 10) == HAL_OK)
-
-              // Simple filter
+              //filter
               filtered = (rxData + previous) / 2;
               previous = rxData;
-
-              // Send to PC
+              //PC
               HAL_UART_Transmit(&huart2, &filtered, 1, HAL_MAX_DELAY);
 
-              // Sampling rate control
+              // e control
 
           }
       }
-      // ================= ULTRASONIC MODE =================
+      // ULTRASONIC mode
       else if(i == '2')
       {
-          // Trigger ultrasonic pulse
+          //trigger
           HAL_GPIO_WritePin(trigger_GPIO_Port, trigger_Pin, GPIO_PIN_SET);
 
           __HAL_TIM_SET_COUNTER(&htim16, 0);
@@ -149,19 +147,17 @@ int main(void)
 
           HAL_GPIO_WritePin(trigger_GPIO_Port, trigger_Pin, GPIO_PIN_RESET);
 
-          // Wait for echo start
+          //echo start
           while(HAL_GPIO_ReadPin(echo_GPIO_Port, echo_Pin) == GPIO_PIN_RESET);
 
           __HAL_TIM_SET_COUNTER(&htim16, 0);
-
-          // Wait for echo end
           while(HAL_GPIO_ReadPin(echo_GPIO_Port, echo_Pin) == GPIO_PIN_SET);
 
           uint16_t duration = __HAL_TIM_GET_COUNTER(&htim16);
 
           float dist = duration * 0.01715f;
 
-          // Object detected nearby
+          //detected nearby
           if(dist < 10)
           {
               buffer = 3;
