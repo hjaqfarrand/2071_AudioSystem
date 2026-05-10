@@ -4,14 +4,13 @@
   * @file           : main.c
   * @brief          : Main program body
   ******************************************************************************
-  * @attention
+  * This code was created by team B14 for the ECE2071 project
   *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
+  * For the processing STM
   *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
+  * Version 2.06
+  *
+  * Created on the 05/05/2026
   *
   ******************************************************************************
   */
@@ -44,9 +43,17 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
+
+
+// Initialising the values --------------------------------------------------------------------------------------------
+
 uint8_t rxData;
 uint8_t previous = 0;
 uint8_t filtered;
+
+// --------------------------------------------------------------------------------------------------------------------
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -100,6 +107,10 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+
+  // Recieve the code and apply moving circular filter then send back to computer ---------------------------------------
+
   while (1)
   {    /* USER CODE END WHILE */
 	  HAL_UART_Receive(&huart1, &rxData, 1, HAL_MAX_DELAY);
@@ -111,6 +122,10 @@ int main(void)
 	  HAL_UART_Transmit(&huart2, &filtered, 1, HAL_MAX_DELAY);
     /* USER CODE BEGIN 3 */
   }
+
+  // --------------------------------------------------------------------------------------------------------------------
+
+
   /* USER CODE END 3 */
 }
 
