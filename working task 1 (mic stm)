@@ -4,15 +4,13 @@
   * @file           : main.c
   * @brief          : Main program body
   ******************************************************************************
-  * @attention
+  * This code was created by team B14 for the ECE2071 project
   *
-  * Copyright (c) 2026 STMicroelectronics.
-  * All rights reserved.
+  * For sampling STM
   *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
+  * Version 2.17
   *
+  * Created on the 04/05/2026
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -48,7 +46,14 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-volatile uint8_t sampledValue;
+
+
+// Initialising the value being sampled -------------------------------------------------------------------------------
+
+volatile uint8_t shakira;
+
+// --------------------------------------------------------------------------------------------------------------------
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -101,7 +106,15 @@ int main(void)
   MX_TIM16_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+
+
+  // Start timer with pointer to timer 16 -------------------------------------------------------------------------------
+
   HAL_TIM_Base_Start_IT(&htim16);
+
+  // --------------------------------------------------------------------------------------------------------------------
+
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -368,19 +381,28 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+
+// Transmit the data to the processing stm ----------------------------------------------------------------------------
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
     if(htim == &htim16)
     {
         HAL_ADC_Start(&hadc1);
 
+        // analog to digital conversion
         HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
 
-        sampledValue = HAL_ADC_GetValue(&hadc1);
+        shakira = HAL_ADC_GetValue(&hadc1);
 
-        HAL_UART_Transmit(&huart1, &sampledValue, 1, HAL_MAX_DELAY);
+        HAL_UART_Transmit(&huart1, &shakira, 1, HAL_MAX_DELAY);
     }
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+
+
 /* USER CODE END 4 */
 
 /**
