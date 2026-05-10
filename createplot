@@ -1,0 +1,18 @@
+def createPlot(data):
+
+    data = (data - data.min()) / data.max() # scale to 0-1
+    data = data * 2 # scale to 0-255
+    data = data - 1 # scale to -1 to 1
+
+    length=len(data)/SAMPLE_RATE
+
+    amp = data
+
+    time = np.arange(0,length,1/SAMPLE_RATE).tolist()
+
+
+    plt.plot(time,amp)
+    plt.xlabel("time (s)")
+    plt.ylabel("amplitude")
+    plt.title("waveform of audio recording")
+    plt.show()
