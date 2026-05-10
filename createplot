@@ -1,3 +1,8 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# the fn assumes SAMPLE_RATE is a global variable
+
 def createPlot(data):
 
     data = (data - data.min()) / data.max() # scale to 0-1
