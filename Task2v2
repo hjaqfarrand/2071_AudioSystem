@@ -1,0 +1,183 @@
+
+import serial
+import wave 
+import numpy as np
+import time
+import matplotlib.pyplot as plt
+import csv
+
+def end():
+    print("end of code reached")
+
+def createPlot(data):
+
+    data = (data - data.min()) / data.max() # scale to 0-1
+    data = data * 2 # scale to 0-255
+    data = data - 1 # scale to -1 to 1
+
+    duration=len(data)/SAMPLE_RATE
+
+    amp = data
+
+    time = np.arange(0,duration,1/SAMPLE_RATE).tolist()
+
+
+    plt.plot(time,amp)
+    plt.xlabel("time (s)")
+    plt.ylabel("amplitude")
+    plt.title("waveform of audio recording")
+    plt.savefig(f"B14_{SAMPLE_RATE}.png")
+
+def createCSV(data):
+    filename = "wavData.csv"
+    if len(data)%SAMPLE_RATE == 0:
+        duration=len(data)/SAMPLE_RATE
+    else:
+        padding = SAMPLE_RATE-(len(data)%SAMPLE_RATE)
+        for a in range(padding):
+            data=np.append(data,0)
+            duration=len(data)/SAMPLE_RATE
+
+    splitData = np.array_split(data,duration)
+
+    # writing to csv file
+    with open(filename, 'w') as csvfile:
+    # creating a csv writer object
+        csvwriter = csv.writer(csvfile)
+    # writing the fields
+        csvwriter.writerow([f"SAMPLE RATE: {SAMPLE_RATE}"])
+    # writing the data rows
+        csvwriter.writerows(splitData)
+
+def record(duration):
+    ser = serial.Serial('COM3', 115200)
+    data = np.array([])
+    loop = duration*SAMPLE_RATE
+
+    for i in range(loop):
+        # read the audio (or use just read)
+        audio = ser.read(1)
+        print(audio)
+
+        # add the new audio data
+        data = np.append(data, audio[0])
+
+    # return data
+    return data
+    
+def createWave(data): #pass data variabale to createWave
+     # normalise  
+    data = (data - data.min()) / data.max() # scale to 0-1
+    data = data * 255 # scale to 0-255
+    data = data.astype(np.uint8) # convert to uint8 type
+
+    with wave.open(f"B14_{SAMPLE_RATE}.wav", 'wb') as wf:
+        wf.setnchannels(1) # mono audio (single channel)
+        wf.setsampwidth(1) # 8 bits (1 byte ) per sample
+        wf.setframerate(SAMPLE_RATE) # set the sample rate that the data was recorded at
+        wf.writeframes(data.tobytes()) # write the audio data to the file
+
+
+    print("finished")
+
+def repeatOutput():
+    try:
+        print("would you like to create another output? (Y/N)")
+        rawUserInput = input(":: ")
+        response = str(rawUserInput)
+        if response == "Y":
+            output()
+        elif response == "N":
+            end()
+        else:
+            print("please provide a valid response")
+            repeatOutput()
+    except:
+        print("an error occured, please provide a valid response")
+        repeatOutput()
+
+def output(audioData):
+
+    print("would you like to output the audio data in any of the following formats?")
+    print("1) .wav file")
+    print("2) amplitude vs time plot")
+    print("3) .csv file containing raw audio data")
+
+    # user chooses format
+    
+    try:
+        rawUserInput = input(":: ")
+        userInput = int(str(rawUserInput))
+        if userInput == 1:
+            createWave(audioData)
+            print(f"a .wav file has been created. \n filename:B14_{SAMPLE_RATE}.wav")
+            repeatOutput()
+        elif userInput == 2:
+            createPlot(audioData)
+            print(f"a .png file has been created. \n filename:B14_{SAMPLE_RATE}.png")
+            repeatOutput()
+        elif userInput == 3:
+            createCSV(audioData)
+            print(f"a .csv file has been created. \n filename:B14_{SAMPLE_RATE}.csv")
+            repeatOutput()
+        else:
+            print("you provided an invalid input")
+            output()
+    except:
+        print("an error occured, please follow specified formatting when providing a response")
+        main()
+        print("specify recording length: ")
+        rawUserInput = input(":: ")
+        duration = int(str(rawUserInput))
+
+def manual():
+    try:
+        print("you're in manual mode")
+        print("specify recording length: ")
+        rawUserInput = input(":: ")
+        duration = int(str(rawUserInput))
+    except:
+        print("an error occured, please provide an integer response to previous question")
+        manual()
+
+    audioData = record(duration)
+    print("recording completed.")
+    output(audioData)
+
+def ultrasonic():
+    #still working on this
+    print("you're in ultrasonic mode")
+
+    print("recording completed.")
+    #output(audioData)
+
+
+     
+def main():
+    global SAMPLE_RATE
+    SAMPLE_RATE = 9000
+
+    print("Home")
+    print("Choose a Mode:")
+    print("1) Manual Recording Mode")
+    print("2) Distance Trigger Mode")
+
+    # user chooses operating mode
+    
+    try:
+        rawUserInput = input(":: ")
+        userInput = int(str(rawUserInput))
+        if userInput == 1:
+            manual()
+        elif userInput == 2:
+            ultrasonic()
+        else:
+            print("try again queen")
+            main()
+    except:
+        print("an error occured, please follow specified formatting when providing a response")
+        main()
+
+
+if __name__ == "__main__":
+    main()
