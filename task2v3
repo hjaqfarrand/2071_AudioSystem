@@ -1,3 +1,7 @@
+// This code was written for the ECE2071 project 2026
+// It was created on 05/05/2026
+// Created by team B14
+// Version 4
 
 import serial
 import wave 
