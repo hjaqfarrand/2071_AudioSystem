@@ -296,26 +296,18 @@ int main(void)
 
 	          // Moving average filter
 
-	          //filteredSample = (rxData + previousSample) / 2;
-
-
-
-	          //previousSample = rxData;
+	          filteredSample = (rxData + previousSample) / 2;
+			previousSample = rxData;
 
 
 
 	          // Send to PC
 
 	          HAL_UART_Transmit(
-
 	              &huart2,
-
-	              &rxData,
-
+	              &filteredSample,
 	              1,
-
 	              HAL_MAX_DELAY
-
 	          );
 
 
