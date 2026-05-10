@@ -151,10 +151,18 @@ def manual(ser):
 def ultrasonic(ser):
     #still working on this
     print("you're in ultrasonic mode")
+    data = np.array([])
+    loop = 30*SAMPLE_RATE
 
-    print("recording completed.")
-    #output(audioData)
+    for i in range(loop):
+        # read the audio (or use just read)
+        audio = ser.read(1)
 
+        # add the new audio data
+        data = np.append(data, audio[0])
+    if len(audio) == 0:
+        print("recording complete")
+        output(data)
 
      
 def main():
