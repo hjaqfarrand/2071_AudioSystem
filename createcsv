@@ -1,0 +1,22 @@
+import csv
+
+def createCSV(data):
+    filename = "wavData.csv"
+    if len(data)%SAMPLE_RATE == 0:
+        duration=len(data)/SAMPLE_RATE
+    else:
+        padding = SAMPLE_RATE-(len(data)%SAMPLE_RATE)
+        for a in range(padding):
+            data=np.append(data,0)
+            duration=len(data)/SAMPLE_RATE
+
+    splitData = np.array_split(data,duration)
+
+# writing to csv file
+    with open(filename, 'w') as csvfile:
+    # creating a csv writer object
+        csvwriter = csv.writer(csvfile)
+    # writing the fields
+        csvwriter.writerow([f"SAMPLE RATE: {SAMPLE_RATE}"])
+    # writing the data rows
+        csvwriter.writerows(splitData)
