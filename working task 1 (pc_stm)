@@ -50,6 +50,8 @@ UART_HandleTypeDef huart2;
 uint8_t rxData;
 uint8_t previous = 0;
 uint8_t filtered;
+int i = 0;
+int buffer = 20;
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -113,13 +115,46 @@ int main(void)
 
   while (1)
   {    /* USER CODE END WHILE */
-	  HAL_UART_Receive(&huart1, &rxData, 1, HAL_MAX_DELAY);
 
-	  filtered = (rxData + previous) / 2;
+	  // Recieve data from PC about mode
+	  HAL_UART_Receive(&huart2, &i, 1, HAL_MAX_DELAY);
+	  // Manual mode
+	  if(i==1){
+			while(1){
+				HAL_UART_Receive(&huart1, &rxData, 1, HAL_MAX_DELAY);
+			    filtered = (rxData + previous) / 2;
+			    previous = rxData;
+			    HAL_UART_Transmit(&huart2, &filtered, 1, HAL_MAX_DELAY);
+			}
 
-	  previous = rxData;
+		// Ultrasonic mode
+		} else if (i==2){
+				HAL_GPIO_WritePin(trigger_GPIO_Port,trigger_Pin,1);
+		  		while (__HAL_TIM_GET_COUNTER(&htim16)<10){}
+		  		while( HAL_GPIO_ReadPin(echo_GPIO_Port, echo_Pin)==0){}
+		  		__HAL_TIM_SET_COUNTER(&htim16, 0);	  
+		  		while( HAL_GPIO_ReadPin(echo_GPIO_Port, echo_Pin)==1){}
+		}
 
-	  HAL_UART_Transmit(&huart2, &filtered, 1, HAL_MAX_DELAY);
+		// Calculate distance
+		uint16_t duration = __HAL_TIM_GET_COUNTER(&htim16);
+		float dist = duration * 1715000;
+
+		if(dist < 10){
+			  HAL_UART_Receive(&huart1, &rxData, 1, HAL_MAX_DELAY);
+			  filtered = (rxData + previous) / 2;
+			  previous = rxData;
+			  HAL_UART_Transmit(&huart2, &filtered, 1, HAL_MAX_DELAY);
+		  } else if (buffer>0){
+			  HAL_UART_Receive(&huart1, &rxData, 1, HAL_MAX_DELAY);
+			  filtered = (rxData + previous) / 2;
+			  previous = rxData;
+			  HAL_UART_Transmit(&huart2, &filtered, 1, HAL_MAX_DELAY);
+			  buffer--;
+		  } else {}
+
+		  HAL_Delay(60);
+
     /* USER CODE BEGIN 3 */
   }
 
