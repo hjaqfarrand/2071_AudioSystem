@@ -1,0 +1,47 @@
+int i = 0;
+  int buffer = 20;
+  /* USER CODE END 2 */
+
+  /* Infinite loop */
+  /* USER CODE BEGIN WHILE */
+  while (1)
+  {
+	  HAL_UART_Receive(huart, &i, 1, HAL_MAX_DELAY);
+	  
+	  if(i==1){ // manual mode
+		  while (1){
+			  HAL_UART_Receive(&huart1, &rxData, 1, HAL_MAX_DELAY);
+			  filtered = (rxData + previous) / 2;
+			  previous = rxData;
+			  HAL_UART_Transmit(&huart2, &filtered, 1, HAL_MAX_DELAY);
+		  }
+		 
+	  } else if (i==2){ // ultrasonic mode
+		  
+		  HAL_GPIO_WritePin(trigger_GPIO_Port,trigger_Pin,1);
+		  while (__HAL_TIM_GET_COUNTER(&htim16)<10){}
+		  while( HAL_GPIO_ReadPin(echo_GPIO_Port, echo_Pin)==0){}
+		  __HAL_TIM_SET_COUNTER(&htim16, 0);	  
+		  while( HAL_GPIO_ReadPin(echo_GPIO_Port, echo_Pin)==1){}
+		  	  
+		  	  //calc distance
+		  uint16_t duration = __HAL_TIM_GET_COUNTER(&htim16);
+		  float dist = duration * 1715000;
+			  
+		  if(dist < 10){
+			  HAL_UART_Receive(&huart1, &rxData, 1, HAL_MAX_DELAY);
+			  filtered = (rxData + previous) / 2;
+			  previous = rxData;
+			  HAL_UART_Transmit(&huart2, &filtered, 1, HAL_MAX_DELAY);
+		  } else if (buffer>0){
+			  HAL_UART_Receive(&huart1, &rxData, 1, HAL_MAX_DELAY);
+			  filtered = (rxData + previous) / 2;
+			  previous = rxData;
+			  HAL_UART_Transmit(&huart2, &filtered, 1, HAL_MAX_DELAY);
+			  buffer--;
+				
+		  } else {}
+
+		  HAL_Delay(60);
+
+	  }
