@@ -3,23 +3,31 @@ import wave
 import numpy as np
 import time
 
-ser = serial.Serial('COM3', 115200)
+
+ser = serial.Serial('COM3', 115200, timeout=2)
+
 
 data = np.array([])
 SAMPLE_RATE = 9000
 loop = 5*SAMPLE_RATE
 
-
+print("Starting the loop")
 
 
 for i in range(loop):
 
     # read the audio (or use just read)
     audio = ser.read(1)
-    print(audio)
+    
+    # to see audio data for trouble shooting
+    print(audio, audio[0], hex(audio[0]))
 
     # add the new audio data
     data = np.append(data, audio[0])
+
+    if len(audio) == 0:
+        print("No data - timeout")
+        break
 
 
 # normalise 
