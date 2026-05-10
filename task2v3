@@ -1,7 +1,7 @@
 // This code was written for the ECE2071 project 2026
 // It was created on 05/05/2026
 // Created by team B14
-// Version 4
+// Version 5
 
 import serial
 import wave 
@@ -61,7 +61,6 @@ def record(ser, duration):
     for i in range(loop):
         # read the audio (or use just read)
         audio = ser.read(1)
-        print(audio)
 
         # add the new audio data
         data = np.append(data, audio[0])
@@ -167,7 +166,7 @@ def ultrasonic(ser):
      
 def main():
     global SAMPLE_RATE
-    SAMPLE_RATE = 9000
+    SAMPLE_RATE = 8000
     ser = serial.Serial('COM3', 115200)
 
     print("Home")
