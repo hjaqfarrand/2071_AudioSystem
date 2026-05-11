@@ -1,0 +1,39 @@
+def output(audioData):
+
+    print("would you like to output the audio data in any of the following formats?")
+    print("1) .wav file")
+    print("2) amplitude vs time plot")
+    print("3) .csv file containing raw audio data")
+
+    # user chooses format
+    
+    try:
+        rawUserInput = input(":: ")
+        userInput = int(str(rawUserInput))
+        if userInput == 1:
+            createWave(audioData)
+            print(f"a .wav file has been created. \n filename:B14_{SAMPLE_RATE}.wav")
+        elif userInput == 2:
+            createPlot(audioData)
+            print(f"a .png file has been created. \n filename:B14_{SAMPLE_RATE}.png")
+        elif userInput == 3:
+            createCSV(audioData)
+            print(f"a .csv file has been created. \n filename:B14_{SAMPLE_RATE}.csv")
+        else:
+            print("you provided an invalid input")
+    except:
+        print("an error occured, please follow specified formatting when providing a response")
+        output()
+    
+    try:
+        print("would you like to create another output? (Y/N)")
+        rawUserInput = input(":: ")
+        response = str(rawUserInput)
+        if response == "Y":
+            output()
+        elif response == "N":
+            end()
+        else:
+            print("please provide a valid response")
+    except:
+        print("an error occurred, please provide a valid response")
